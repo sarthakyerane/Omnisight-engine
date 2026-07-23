@@ -1,0 +1,61 @@
+services:
+
+  # ── Redis — message queue between capture daemon and AI worker ──────────────
+  redis:
+    image: redis:7-alpine
+    container_name: riom_redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # ── AI Worker — OCR + Groq LLM + ChromaDB embedding ────────────────────────
+  worker:
+    build: .
+    container_name: riom_worker
+    command: python -m ai.worker
+    env_file:
+      - .env
+    environment:
+      # Override Redis URL to use the Docker service name
+      REDIS_URL: redis://redis:6379/0
+      DATABASE_URL: sqlite:////data/ambient_memory.db
+      DATA_DIR: /data
+      CHROMA_PERSIST_DIR: /data/chroma_db
+    volumes:
+      # Share the data directory with the capture daemon (running on host)
+      - ./data:/data
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # ── Query API — FastAPI semantic search endpoint ────────────────────────────
+  api:
+    build: .
+    container_name: riom_api
+    command: python -m uvicorn api.main:app --host 0.0.0.0 --port 8000
+    env_file:
+      - .env
+    environment:
+      REDIS_URL: redis://redis:6379/0
+      DATABASE_URL: sqlite:////data/ambient_memory.db
+      DATA_DIR: /data
+      CHROMA_PERSIST_DIR: /data/chroma_db
+    volumes:
+      - ./data:/data
+    ports:
+      - "8000:8000"
+    depends_on:
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  redis_data:
