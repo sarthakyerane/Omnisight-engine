@@ -1,0 +1,53 @@
+# Environment & Secrets
+.env
+*.env
+
+# Captured Screen Data (NEVER commit)
+data/
+*.jpg
+*.jpeg
+*.png
+*.webp
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+.venv/
+venv/
+env/
+ENV/
+
+# Vector store (ChromaDB)
+chroma_db/
+.chroma/
+
+# Logs
+*.log
+logs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
