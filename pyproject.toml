@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "riom"
+version = "0.1.0"
+description = "Real-time Intelligent Observation & Memory — an ambient screen understanding daemon with AI-powered recall."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+dependencies = [
+    "pydantic-settings>=2.0.3",
+    "loguru>=0.7.2",
+    "mss>=9.0.1",
+    "Pillow>=10.0.1",
+    "ImageHash>=4.3.1",
+    "pystray>=0.9.1",
+    "psutil>=5.9.5",
+    "SQLAlchemy>=2.0.21",
+    "redis>=5.0.1",
+    "pytesseract>=0.3.10",
+    "openai>=1.30.0",
+    "sentence-transformers>=2.7.0",
+    "chromadb>=0.5.0",
+    "fastapi>=0.111.0",
+    "uvicorn[standard]>=0.30.0",
+    "pydantic>=2.7.0",
+]
+
+[project.optional-dependencies]
+windows = ["pywin32>=306"]
+dev = [
+    "pytest>=8.2.0",
+    "pytest-mock>=3.14.0",
+    "pytest-asyncio>=0.23.0",
+    "httpx>=0.27.0",
+]
+
+[project.scripts]
+riom-capture = "capture.main:main"
+riom-worker = "ai.worker:main"
+riom-api = "api.main:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["capture*", "storage*", "ai*", "api*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
